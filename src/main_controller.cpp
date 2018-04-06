@@ -79,49 +79,41 @@ int main(int argc, char **argv)
 			  break;
 
 		  case 110: // n: atterrir
-		  bebop.sendLand();	
+		 	 bebop.sendLand();	
 			  track=0;
-              break;
+            		  break;
 
-          case 105: // i: avancer
+         	  case 105: // i: avancer
 			  avancement =  0.1;
-			  track=0;
-              break;
+			  break;
 
 		  case 107: // k: reculer
-	          avancement =  -0.1;
-			  track=0;
-              break;
+	         	 avancement =  -0.1;
+			  break;
 
 		  case 97: // a: rotation gauche
 			  rotation =  0.1;
-			  track=0;
-              break;
+			   break;
 
 		  case 100: // d:rotation doite
-			  yaw =  -0.1;
-			  track=0;
-              break;
+			  rotation =  -0.1;
+			   break;
 
 		  case 106: // j:translation gauche
-			  rotation =  0.1;
-			  track=0;
-              break;
+			  translation =  0.1;
+			  break;
 
 		  case 108: // l:translation droite
-			  rotation =  -0.1;
-			  track=0;
-              break;
+			  translation =  -0.1;
+		          break;
 
 		  case 119: // w:monter en altitude
 			  hauteur =  0.1;
-			  track=0;
-              break;
+		     	   break;
 
 		  case 115: // s:descendre en altitude
-	          hauteur =  -0.5;
-			  track=0;
-              break;
+	         	 hauteur =  -0.5;
+			  break;
 		
 		  case 118: // v: track or stop tracking
 			  if(track!=1){
@@ -177,7 +169,7 @@ int main(int argc, char **argv)
                 if((taille_h>2500)&&(taille_h<10000)){
                 printf("rester\n\r");
                 avancement=0;
-}
+		}
                 if(taille_h<2500){
 			printf("avancer\n\r");
 			avancement=0.1;
@@ -189,7 +181,7 @@ int main(int argc, char **argv)
                 if(taille_h<100){
                         avancement=0;
                         printf("Cilbe perdu\n\r");
-}
+		}
 		printf("vitesse avancement %f\n\r",avancement);	
 				
 		}
