@@ -81,47 +81,39 @@ int main(int argc, char **argv)
 		  case 110: // n: atterrir
 		  bebop.sendLand();	
 			  track=0;
-              break;
+              		 break;
 
           case 105: // i: avancer
 			  avancement =  0.5;
-			  track=0;
-              break;
+			  break;
 
 		  case 107: // k: reculer
-	          avancement =  -0.5;
-			  track=0;
-              break;
+	          	avancement =  -0.5;
+              		break;
 
 		  case 97: // a: rotation gauche
 			  rotation =  0.5;
-			  track=0;
-              break;
+			 break;
 
 		  case 100: // d:rotation doite
-			  yaw =  -0.5;
-			  track=0;
-              break;
+			  rotation =  -0.5;
+		      break;
 
 		  case 106: // j:translation gauche
-			  rotation =  0.5;
-			  track=0;
-              break;
+			  translation =  0.5;
+		      break;
 
 		  case 108: // l:translation droite
-			  rotation =  -0.5;
-			  track=0;
-              break;
+			  translation =  -0.5;
+			 break;
 
 		  case 119: // w:monter en altitude
 			  hauteur =  0.5;
-			  track=0;
-              break;
+		         break;
 
 		  case 115: // s:descendre en altitude
-	          hauteur =  -0.5;
-			  track=0;
-              break;
+	         	 hauteur =  -0.5;
+		      break;
 		
 		  case 118: // v: track or stop tracking
 			  if(track!=1){
