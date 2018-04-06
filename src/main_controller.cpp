@@ -70,7 +70,8 @@ int main(int argc, char **argv)
 
   while(ros::ok())
   {
-   if (keypressed()) { // a key is pressed
+   if (keypressed()) 			// a key is pressed
+   { 
 	   switch(getch()) // ASCII values
 		{
 		  case 116: // t: decoller
@@ -81,14 +82,14 @@ int main(int argc, char **argv)
 		  case 110: // n: atterrir
 		 	 bebop.sendLand();	
 			  track=0;
-            		  break;
+			  break;
 
-         	  case 105: // i: avancer
+		  case 105: // i: avancer
 			  avancement =  0.1;
 			  break;
 
 		  case 107: // k: reculer
-	         	 avancement =  -0.1;
+			 avancement =  -0.1;
 			  break;
 
 		  case 97: // a: rotation gauche
@@ -105,14 +106,14 @@ int main(int argc, char **argv)
 
 		  case 108: // l:translation droite
 			  translation =  -0.1;
-		          break;
+			  break;
 
 		  case 119: // w:monter en altitude
 			  hauteur =  0.1;
-		     	   break;
+			   break;
 
 		  case 115: // s:descendre en altitude
-	         	 hauteur =  -0.5;
+			 hauteur =  -0.5;
 			  break;
 		
 		  case 118: // v: track or stop tracking
@@ -130,66 +131,68 @@ int main(int argc, char **argv)
      }
      else  // a key is not pressed
      {
-		if(track!=0){
-		printf("couleur X %d\n\r",couleur_x);
-		printf("couleur y %d\n\r" ,couleur_y);
-		printf("taille  %f\n\r",taille_h);
-			
-		//calcul vitesse de deplacement en hauteur
-		if(couleur_y<y_min){
-			vitesse_y = 0.1;
-			printf("monter \n\r");
-		}else if(couleur_y>y_max){
-			vitesse_y = -0.1;
-			printf("descendre \n\r");
-		}else{
-			vitesse_y = 0;
-			printf("altitude OK \n\r");
-		}
+		if(track!=0)
+		{
+			printf("couleur X %d\n\r",couleur_x);
+			printf("couleur y %d\n\r" ,couleur_y);
+			printf("taille  %f\n\r",taille_h);
 
-		printf("changement d'altitude %f\n\r",vitesse_y);
-		hauteur = vitesse_y;
-				
-		//calcul vitesse de deplacement en rotation
-		if(couleur_x<x_min){
-			vitesse_x = 0.1*((x_min-couleur_x)/50);
-			printf("tourner gauche \n\r");
-		}else if(x_max<couleur_x){
-			vitesse_x = -0.1*((couleur_x-x_max)/50);
-			printf("tourner droite \n\r");
-		}else{
-			vitesse_x = 0;
-			printf("ne pas tourner \n\r");
-		}
+			//calcul vitesse de deplacement en hauteur
+			if(couleur_y<y_min){
+				vitesse_y = 0.1;
+				printf("monter \n\r");
+			}else if(couleur_y>y_max){
+				vitesse_y = -0.1;
+				printf("descendre \n\r");
+			}else{
+				vitesse_y = 0;
+				printf("altitude OK \n\r");
+			}
 
-		printf("vitesse de rotation %f\n\r",vitesse_x);
-		rotation = vitesse_x;
-		
-		//calcul vitesse de deplacement avant/arrière
-                if((taille_h>2500)&&(taille_h<10000)){
-                printf("rester\n\r");
-                avancement=0;
-		}
-                if(taille_h<2500){
-			printf("avancer\n\r");
-			avancement=0.1;
-		}
-                if(taille_h>10000){
-			printf("reculer\n\r");
-			avancement=-0.1;
-		}
-                if(taille_h<100){
-                        avancement=0;
-                        printf("Cilbe perdu\n\r");
-		}
-		printf("vitesse avancement %f\n\r",avancement);	
-				
+			printf("changement d'altitude %f\n\r",vitesse_y);
+			hauteur = vitesse_y;
+
+			//calcul vitesse de deplacement en rotation
+			if(couleur_x<x_min){
+				vitesse_x = 0.1*((x_min-couleur_x)/50);
+				printf("tourner gauche \n\r");
+			}else if(x_max<couleur_x){
+				vitesse_x = -0.1*((couleur_x-x_max)/50);
+				printf("tourner droite \n\r");
+			}else{
+				vitesse_x = 0;
+				printf("ne pas tourner \n\r");
+			}
+
+			printf("vitesse de rotation %f\n\r",vitesse_x);
+			rotation = vitesse_x;
+
+			//calcul vitesse de deplacement avant/arrière
+					if((taille_h>2500)&&(taille_h<10000)){
+					printf("rester\n\r");
+					avancement=0;
+			}
+					if(taille_h<2500){
+				printf("avancer\n\r");
+				avancement=0.1;
+			}
+					if(taille_h>10000){
+				printf("reculer\n\r");
+				avancement=-0.1;
+			}
+					if(taille_h<100){
+			// a key is pressed				avancement=0;
+							printf("Cilbe perdu\n\r");
+			}
+			printf("vitesse avancement %f\n\r",avancement);	
+
 		}
 		printf("\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r");
-		 }
-		 bebop.setCommand(avancement, translation, hauteur, rotation);
-		 ros::spinOnce(); 
-		 loop_rate.sleep();  
-	  }
+	 }
+	 bebop.setCommand(avancement, translation, hauteur, rotation);
+	 avancement = 0.00, translation = 0.00, hauteur = 0.00, rotation = 0.00; 
+	 ros::spinOnce(); 
+	 loop_rate.sleep();  
+  }
   endwin();
 }
