@@ -28,7 +28,6 @@ int track=0;
 float vitesse_x = 0.0;
 float vitesse_y = 0.0;
 float taille_h;
-float yaw;
 
 //recuperation de la position couleur
 void  posCallback(const geometry_msgs::Point myPos)
