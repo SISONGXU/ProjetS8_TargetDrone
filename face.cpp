@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/face.hpp"
-
+#include <geometry_msgs/Point.h>
  
 using namespace std;
 using namespace cv;
@@ -27,6 +27,7 @@ class ImageConverter
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
   image_transport::Publisher image_pub_;
+  ros::Publisher pub;
  
 public:
   ImageConverter(): it_(nh_)
@@ -34,6 +35,7 @@ public:
     // Subscrive to input video feed and publish output video feed
     image_sub_ = it_.subscribe("/bebop/image_raw", 1, &ImageConverter::imageCb2, this); 
     image_pub_ = it_.advertise("/image_converter/outputvideo", 1);
+    pub = nh_.advertise<geometry_msgs::Point>("/cible_face", 1000);
     
     if( !face_cascade.load( face_cascade_name ) ){ printf("--(!)Error loading\n"); };
     if( !eyes_cascade.load( eyes_cascade_name ) ){ printf("--(!)Error loading\n"); };
@@ -81,10 +83,17 @@ public:
     {
         Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
         ellipse( frame, center, Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar  ( 255, 0, 255 ), 4, 8, 0 );
+        if(i=0){
+                geometry_msgs::Point pos_f;
+		pos_f.x = center.x;
+		pos_f.y = center.y;
+		pos_f.z= cvRound(faces[i].width*0.5*faces[i].height*0.5*3.1415);
+		pub.publish(pos_f);
+         }
  
         Mat faceROI = frame_gray( faces[i] );
+        
         std::vector<Rect> eyes;
- 
         eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
  
         for( int j = 0; j < eyes.size(); j++ )
@@ -94,7 +103,8 @@ public:
             circle( frame, center, radius, Scalar( 255, 0, 0 ), 4, 8, 0 );
         }
     }
-    
+
+
     imshow( OPENCV_WINDOW, frame );
 
   }
