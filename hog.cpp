@@ -10,6 +10,10 @@
 #include <string>
 #include <sstream>
 #include <geometry_msgs/Point.h>
+#include <stdexcept>
+#include <opencv2/objdetect.hpp>
+#include <opencv2/imgcodecs.hpp>
+
 
 using namespace cv;
 using namespace std;
@@ -58,11 +62,10 @@ class ImageConverter
       return;
     }
 	
-	// Perform HSV tranformation
 
 	cv::Mat imgRGB = cv_ptr->image;	
 	
- 	int iLowH = 0;
+ 	/*int iLowH = 0;
  	int iHighH = 30;
 
  	int iLowS = 120; 
@@ -75,43 +78,50 @@ class ImageConverter
 	
 	
 	cv::cvtColor(imgRGB, imgHSV, cv::COLOR_BGR2HSV);
-	
-	//cv::Mat frame = cv_ptr->image;
-    //Mat img = cv_ptr->image;
+	  
+	  */
+	  
+	  
 	
 	vector<Rect> found, found_filtered;
+    double t = (double) getTickCount();
+    // Run the detector with default parameters. to get a higher hit-rate
+    // (and more false alarms, respectively), decrease the hitThreshold and
+    // groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
+    hog.detectMultiScale(imgRGB, found, 0, Size(8,8), Size(0,0), 1.05, 2);
+    t = (double) getTickCount() - t;
+    cout << "detection time = " << (t*1000./cv::getTickFrequency()) << " ms" << endl;
 
+    for(size_t i = 0; i < found.size(); i++ )
+    {
+        Rect r = found[i];
 
-	//________LAG________________________________________
-	hog.detectMultiScale(imgHSV, found, 0, Size(8,8),Size(0,0), 1.05, 2);
-	//?? hog.detectMultiScale(img, found, 0, Size(0,0), Size(16,16), 1.05, 2);
-	//________________________________________________
-	size_t i, j;
-	for (i=0; i<found.size(); i++) 
-	{
-		Rect r = found[i];
-		for (j=0; j<found.size(); j++)
-		{ 
-			if (j!=i && (r & found[j]) == r)   //refound a same target
-				break;
-			if (j== found.size())
-			found_filtered.push_back(r);
-		}
-	}
+        size_t j;
+        // Do not add small detections inside a bigger detection.
+        for ( j = 0; j < found.size(); j++ )
+            if ( j != i && (r & found[j]) == r )
+                break;
 
-	for (i=0; i<found_filtered.size(); i++) 
-	{
-		Rect r = found_filtered[i];
-		r.x += cvRound(r.width*0.1);
-		r.width = cvRound(r.width*0.8);
-		r.y += cvRound(r.height*0.07);
-		r.height = cvRound(r.height*0.8);
+        if ( j == found.size() )
+            found_filtered.push_back(r);
+    }
+
+	 for (size_t i = 0; i < found_filtered.size(); i++)
+    {
+        Rect r = found_filtered[i];
+		// The HOG detector returns slightly larger rectangles than the real objects,
+        // so we slightly shrink the rectangles to get a nicer output.
+        r.x += cvRound(r.width*0.1);
+        r.width = cvRound(r.width*0.8);
+        r.y += cvRound(r.height*0.07);
+        r.height = cvRound(r.height*0.8);
 		rectangle(imgRGB, r.tl(), r.br(), Scalar(0,255,0), 3);        
+		
 		geometry_msgs::Point pos_h;
-		pos_h.x = (r.x+(r.width/2));
-		pos_h.y = r.y;
+		pos_h.x = r.width;
 		pos_h.z= r.height;
 		pub2.publish(pos_h);
+		
 	}
 	image_pub_.publish(cv_ptr->toImageMsg());
 	imshow("ciblehumaine", imgRGB);
