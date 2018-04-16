@@ -13,9 +13,11 @@
  
 using namespace std;
 using namespace cv;
- 
-const std::string face_cascade_name = "../opencv-3.2.0/data/haarcascades/haarcascade_frontalface_alt.xml";
-const std::string eyes_cascade_name = "../opencv-3.2.0/data/haarcascades/haarcascade_eye_tree_eyeglasses.xml";
+
+const string face_cascade_name = "opencv-3.2.0/data/haarcascades/haarcascade_frontalface_alt.xml";
+const string eyes_cascade_name = "opencv-3.2.0/data/haarcascades/haarcascade_eye_tree_eyeglasses.xml";
+
+
 cv::CascadeClassifier face_cascade;
 cv::CascadeClassifier eyes_cascade;
  
@@ -77,20 +79,30 @@ public:
     cvtColor( frame, frame_gray, CV_BGR2GRAY );
     equalizeHist( frame_gray, frame_gray );
 
-    face_cascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+    face_cascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_SCALE_IMAGE, Size(30, 30) );
  
      for( int i = 0; i < faces.size(); i++ )
     {
-        Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
+         Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
+         double aspect_ratio = (double)faces[i].width/faces[i].height;
+        if( 0.9 < aspect_ratio && aspect_ratio < 1.1 )
+        {
+       
         ellipse( frame, center, Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar  ( 255, 0, 255 ), 4, 8, 0 );
-        if(i=0){
+       /* if(i=0){
+                ellipse( frame, center, Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar  ( 0, 0, 255 ), 4, 8, 0 );
                 geometry_msgs::Point pos_f;
 		pos_f.x = center.x;
 		pos_f.y = center.y;
-		pos_f.z= cvRound(faces[i].width*0.5*faces[i].height*0.5*3.1415);
+		pos_f.z= cvRound(faces[0].width*0.5*faces[0].height*0.5*3.1415);
 		pub.publish(pos_f);
          }
- 
+ */    if(center.x>300&&center.x<550&&center.y>150&&center.y<350){
+        rectangle( frame, faces[i].tl(),faces[i].br(), Scalar(0,255,0), 3 );
+         ROS_INFO("x : %d", center.x);
+	ROS_INFO("y : %d", center.y);
+	ROS_INFO("surface : %d", faces[0].width*faces[0].height);}
+}
         Mat faceROI = frame_gray( faces[i] );
         
         std::vector<Rect> eyes;
@@ -102,8 +114,9 @@ public:
             int radius = cvRound( (eyes[j].width + eyes[i].height)*0.25 );
             circle( frame, center, radius, Scalar( 255, 0, 0 ), 4, 8, 0 );
         }
-    }
-
+    
+}
+   
 
     imshow( OPENCV_WINDOW, frame );
 
