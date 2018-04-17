@@ -16,7 +16,6 @@ find_package(catkin REQUIRED
   roscpp
   rospy
   std_msgs
-  OpenCV
   image_transport
   geometry_msgs
   cv_bridge
@@ -40,5 +39,5 @@ add_executable(${PROJECT_NAME}_main_controller src/main_controller.cpp )
 target_link_libraries(${PROJECT_NAME}_main_controller ${catkin_LIBRARIES} ${CURSES_LIBRARIES} ${PROJECT_NAME}_keyboard_controller)
 
 
-add_executable(${PROJECT_NAME}_color_bebop src/color_bebop.cpp)
-target_link_libraries(${PROJECT_NAME}_color_bebop ${OpenCV_LIBRARIES} ${catkin_LIBRARIES}  )
+add_executable(${PROJECT_NAME}_image_converter src/image_converter.cpp)
+target_link_libraries(${PROJECT_NAME}_image_converter ${OpenCV_LIBRARIES} ${catkin_LIBRARIES}  )
