@@ -8,7 +8,7 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <string>
-#include <sstream>d
+#include <sstream>
 #include <geometry_msgs/Quaternion.h>
 #include <stdexcept>
 #include <opencv2/objdetect.hpp>
