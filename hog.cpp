@@ -8,8 +8,8 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <string>
-#include <sstream>
-#include <geometry_msgs/Point.h>
+#include <sstream>d
+#include <geometry_msgs/Quaternion.h>
 #include <stdexcept>
 #include <opencv2/objdetect.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -37,7 +37,7 @@ class ImageConverter
 	  // Subscrive to input video feed and publish output video feed
 	  //?? image_sub_ = it_.subscribe("/bebop/image_raw", 1,&ImageConverter::imageCb, this);
 	  image_pub_ = it_.advertise("/image_converter/output_video", 1);
-	  pub2 = nh_.advertise<geometry_msgs::Point>("/cible_humaine", 1000);
+	  pub2 = nh_.advertise<geometry_msgs::Quaternion>("/cible_humaine", 1000);       //return 4 values
 	  namedWindow("ciblehumaine", CV_WINDOW_AUTOSIZE);
 	  moveWindow( "ciblehumaine",0,600);
   }
@@ -64,24 +64,6 @@ class ImageConverter
 	
 
 	cv::Mat imgRGB = cv_ptr->image;	
-	
- 	/*int iLowH = 0;
- 	int iHighH = 30;
-
- 	int iLowS = 120; 
- 	int iHighS = 235;
-
- 	int iLowV = 120;
- 	int iHighV = 255;
-
-	cv::Mat imgHSV;
-	
-	
-	cv::cvtColor(imgRGB, imgHSV, cv::COLOR_BGR2HSV);
-	  
-	  */
-	  
-	  
 	
 	vector<Rect> found, found_filtered;
     double t = (double) getTickCount();
@@ -113,15 +95,21 @@ class ImageConverter
         // so we slightly shrink the rectangles to get a nicer output.
         r.x += cvRound(r.width*0.1);
         r.width = cvRound(r.width*0.8);
-        r.y += cvRound(r.height*0.07);
+        r.y += cvRound(r.height*0.08);
         r.height = cvRound(r.height*0.8);
 		rectangle(imgRGB, r.tl(), r.br(), Scalar(0,255,0), 3);        
-		
-		geometry_msgs::Point pos_h;
-		pos_h.x = r.width;
-		pos_h.z= r.height;
+		Point tp = r.tl();
+		Point br = r.br();
+		geometry_msgs::Quaternion pos_h;
+		pos_h.x = tp.x;
+		pos_h.y= tp.y;
+		pos_h.z= br.x;
+		pos_h.w= br.y;
 		pub2.publish(pos_h);
-		
+		cout << "x = " << tp.x << " " << endl;
+	    cout << "y = " << tp.y << " " << endl;
+		cout << "x2 = " << br.x << " " << endl;
+		cout << "y2 = " << br.y << " " << endl;
 	}
 	image_pub_.publish(cv_ptr->toImageMsg());
 	imshow("ciblehumaine", imgRGB);
