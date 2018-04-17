@@ -122,22 +122,19 @@ public:
 	std_msgs::Int32 xPos;
 	std_msgs::Int32 yPos;
 	std_msgs::Int32 surfaceValue;
-
 	xPos.data = x;
 	yPos.data = y;
 	surfaceValue.data = surface;
-
 	ROS_INFO("x : %d", xPos.data);
 	ROS_INFO("y : %d", yPos.data);
 	ROS_INFO("surface : %d", surfaceValue.data);
-
 	chatter_pub.publish(xPos);
 	chatter_pub.publish(yPos);
 	chatter_pub.publish(surfaceValue);*/
         geometry_msgs::Point myPos;
         myPos.x = x;
         myPos.y = y;
-	myPos.z = surface;
+	    myPos.z = surface;
         ROS_INFO("x : %f", myPos.x);
 	ROS_INFO("y : %f", myPos.y);
 	ROS_INFO("surface : %f", myPos.z );
