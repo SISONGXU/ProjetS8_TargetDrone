@@ -55,10 +55,7 @@ void posCallbackRectangle(const geometry_msgs::Quaternion pos_h)
 	rectangle_x2 = pos_h.z;
 	rectangle_y2 = pos_h.w;
 	
-	//changement des données rectangle en données couleur
-	centre_x = (rectangle_x1 + rectangle_x2)/2;
-	centre_y = (rectangle_y1 + rectangle_y2)/2;
-	taille_h = (rectangle_x2-rectangle_x1)*(rectangle_y2-rectangle_y1);
+	
 	
 }
 
@@ -100,6 +97,10 @@ int main(int argc, char **argv)
 		  else{
 			  zoom_timer=0;}
 	  }
+	  
+	centre_x = (rectangle_x1 + rectangle_x2)/2;
+	centre_y = (rectangle_y1 + rectangle_y2)/2;
+	taille_h = (rectangle_x2-rectangle_x1)*(rectangle_y2-rectangle_y1);
 	  
    if (keypressed()) 			// a key is pressed
    {
@@ -162,7 +163,7 @@ int main(int argc, char **argv)
 			   break;
 		   case 98: // b: zoom in
 			   if (zoom_timer==0){
-				   taille_init=taille_hinit*1.1;
+				   taille_init=taille_init*1.1;
 			   }
 			   break;
 		   case 99: // c:zoom out
