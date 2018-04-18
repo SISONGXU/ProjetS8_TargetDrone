@@ -38,6 +38,8 @@ float taille_h;
 float yaw;
 //timer zoom
 int zoom_timer;
+// valeur par défaut au décollage
+float avancement = 0.00, translation = 0.00, hauteur = 0.00, rotation = 0.00;
 
 //recuperation de la position couleur
 void  posCallback(const geometry_msgs::Point myPos)
@@ -81,7 +83,7 @@ int main(int argc, char **argv)
 
 
   DroneController bebop;
-  float avancement = 0.00, translation = 0.00, hauteur = 0.00, rotation = 0.00; 
+ 
   initscr();
 
   cbreak();
