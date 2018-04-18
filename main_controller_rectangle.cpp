@@ -164,11 +164,13 @@ int main(int argc, char **argv)
 		   case 98: // b: zoom in
 			   if (zoom_timer==0){
 				   taille_init=taille_init*1.1;
+				   zoom_timer++;
 			   }
 			   break;
 		   case 99: // c:zoom out
 			   if(zoom_timer==0){
 				   taille_init=taille_init*0.9;
+				   zoom_timer++;
 			   }
 			  break;
 	      default:
@@ -229,9 +231,9 @@ int main(int argc, char **argv)
 				printf("reculer\n\r");
 				avancement=avancement - 0.01;
 			}
-					if(taille_h<100){
-			// a key is pressed				avancement=0;
-							printf("Cilbe perdu\n\r");
+					if(taille_h<100){			
+						avancement=0;
+						printf("Cilbe perdu\n\r");
 			}
 			printf("vitesse avancement %f\n\r",avancement);	
 
