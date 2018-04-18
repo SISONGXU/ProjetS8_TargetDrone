@@ -36,6 +36,8 @@ float vitesse_x = 0.0;
 float vitesse_y = 0.0;
 float taille_h;
 float yaw;
+//timer zoom
+int zoom_timer;
 
 //recuperation de la position couleur
 void  posCallback(const geometry_msgs::Point myPos)
@@ -46,12 +48,12 @@ void  posCallback(const geometry_msgs::Point myPos)
 }
 
 //recuperation de la position rectangle
-void posCallbackRectangle(const geometry_msgs::Quaternion myRectangle)
+void posCallbackRectangle(const geometry_msgs::Quaternion pos_h)
 {
-	rectangle_x1 = myRectangle.x;
-	rectangle_y1 = myRectangle.y;
-	rectangle_x2 = myRectangle.z;
-	rectangle_y2 = myRectangle.w;
+	rectangle_x1 = pos_h.x;
+	rectangle_y1 = pos_h.y;
+	rectangle_x2 = pos_h.z;
+	rectangle_y2 = pos_h.w;
 	
 	//changement des données rectangle en données couleur
 	centre_x = (rectangle_x1 + rectangle_x2)/2;
@@ -88,9 +90,17 @@ int main(int argc, char **argv)
   cbreak();
   noecho();
   nodelay(stdscr, TRUE);
-
+  zoom_timer=0;
   while(ros::ok())
   {
+	  if (zoom_timer!=0){
+		  if(zoom_timer!=30){
+			  zoom_timer++;
+		  }
+		  else{
+			  zoom_timer=0;}
+	  }
+	  
    if (keypressed()) 			// a key is pressed
    {
 	   //reset all movement variables when a key is pressed to avoid conflict with the tracking mode
@@ -150,8 +160,15 @@ int main(int argc, char **argv)
 			  track=0;
 			  }
 			   break;
-		   case 98: // b: fixe la taille initiale
-			   taille_init=taille_h;
+		   case 98: // b: zoom in
+			   if (zoom_timer==0){
+				   taille_init=taille_hinit*1.1;
+			   }
+			   break;
+		   case 99: // c:zoom out
+			   if(zoom_timer==0){
+				   taille_init=taille_init*0.9;
+			   }
 			  break;
 	      default:
               break;
@@ -170,10 +187,10 @@ int main(int argc, char **argv)
 
 			//calcul vitesse de deplacement en hauteur
 			if(centre_y<y_min){
-				vitesse_y = vitesse_y + 0.05;
+				vitesse_y = vitesse_y + 0.01;
 				printf("monter \n\r");
 			}else if(centre_y>y_max){
-				vitesse_y = vitesse_y - 0.05;
+				vitesse_y = vitesse_y - 0.01;
 				printf("descendre \n\r");
 			}else{
 				vitesse_y = 0;
@@ -205,11 +222,11 @@ int main(int argc, char **argv)
 			}
 					if(taille_h<taille_init*0.95){
 				printf("avancer\n\r");
-				avancement=avancement + 0.05;
+				avancement=avancement + 0.01;
 			}
 					if(taille_h>taille_init*1.05){
 				printf("reculer\n\r");
-				avancement=avancement - 0.05;
+				avancement=avancement - 0.01;
 			}
 					if(taille_h<100){
 			// a key is pressed				avancement=0;
