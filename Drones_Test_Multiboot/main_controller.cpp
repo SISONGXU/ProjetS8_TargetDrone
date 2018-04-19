@@ -180,7 +180,8 @@ int main(int argc, char **argv)
 				avancement=-0.1;
 			}
 					if(taille_h<100){
-			// a key is pressed				avancement=0;
+			// a key is pressed				
+						avancement = 0.00, translation = 0.00, hauteur = 0.00, rotation = 0.00;
 							printf("Cilbe perdu\n\r");
 			}
 			printf("vitesse avancement %f\n\r",avancement);	
