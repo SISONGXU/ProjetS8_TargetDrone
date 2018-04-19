@@ -4,6 +4,8 @@
 #include <unistd.h> 
 #include <ios>
 #include <string>
+#include <geometry_msgs/Quaternion.h>
+#include <fstream>
 
 //position couleur
 int centre_x;
@@ -41,7 +43,7 @@ int zoom_timer = 0;
 //Initialisation des consignes de pilotage
 float avancement = 0.00, translation = 0.00, hauteur = 0.00, rotation = 0.00; 
 
-using manespace std;
+using namespace std;
 
 //recuperation de la position couleur
 void  posCallback(const geometry_msgs::Point myPos)
@@ -60,26 +62,30 @@ void posCallbackRectangle(const geometry_msgs::Quaternion pos_h)
 	rectangle_y2 = pos_h.w;	
 }
 
-void posCallbackDeepLearning(void)
+int posCallbackDeepLearning(void)
 {
 
-	string values[4];
-	std::ifstream infile ("src/deep_learning/src/rectangle.txt");
-	
+	string str_values[4];
+	int int_values[4];
+	ifstream infile ("src/deep_learning/src/rectangle.txt");
+	stringstream ss;
 	if (infile.is_open())
 	{
-		for (line in infile){
-			getline(infile, values[line]);
+		for (int line=0; line<=3; line++){
+			getline(infile, str_values[line]);
+			ss.clear();
+			ss.str(str_values[line]);
+			ss >> int_values[line];
 		}
-		rectangle_x1 = int(values[0]);
-		rectangle_y1 = int(values[1]);
-		rectangle_x2 = int(values[2]);
-		rectangle_y2 = int(values[3]);
+		rectangle_x1 = int_values[0];
+		rectangle_y1 = int_values[1];
+		rectangle_x2 = int_values[2];
+		rectangle_y2 = int_values[3];
 	}else{
 		cerr << "rectangle.txt can't be open!";
 	}
     	infile.close();
-	return rectangle_x1, rectangle_y1, rectangle_x2, rectangle_y2;
+	return (rectangle_x1, rectangle_y1, rectangle_x2, rectangle_y2);
 }
 
 
@@ -106,8 +112,8 @@ int main(int argc, char **argv)
 
 
   // Uncomment to use the Deep Learning box positions
-  (rectangle_x1, rectangle_y1, rectangle_x2, rectangle_y2) = posCallbackDeepLearning();
-
+  rectangle_x1, rectangle_y1, rectangle_x2, rectangle_y2 = posCallbackDeepLearning();
+  printf("%d %d %d %d",rectangle_x1, rectangle_y1, rectangle_x2, rectangle_y2);
   DroneController bebop;
   
   initscr();
