@@ -18,7 +18,34 @@
 using namespace cv;
 using namespace std;
 cv::HOGDescriptor hog;
-//?? HOGDescriptor hog;
+
+//centre de zone qu'on a choisi a suivre
+//video:856 x 480,donc on prends le centre de video par default
+int center_x = 428;
+int center_y = 240;
+int side_x_l = 278;   //428-150
+int side_x_r = 578;   //428+150
+
+
+Mat imgRGB;
+Mat img;
+
+void getObjectCenter(int event, int x, int y, int flags, void *param = NULL) { 
+
+  
+  if(event == CV_EVENT_LBUTTONUP) {
+      center_x=x;
+      center_y=y;
+      side_x_l=x-150;
+      side_x_r=x+150;
+      cout << "center_x = " << center_x << " " << endl;
+      cout << "center_y = " << center_y << " " << endl;
+      cout << "side_x_l = " << side_x_l << " " << endl;
+      cout << "side_x_r = " << side_x_r << " " << endl;
+    }
+ 
+}
+
 class ImageConverter
 {
   ros::NodeHandle nh_;
@@ -35,17 +62,16 @@ class ImageConverter
 	  hog.setSVMDetector(HOGDescriptor::getDefaultPeopleDetector());
 	  image_sub_ = it_.subscribe("/bebop/image_raw", 1,&ImageConverter::imageCb, this);
 	  // Subscrive to input video feed and publish output video feed
-	  //?? image_sub_ = it_.subscribe("/bebop/image_raw", 1,&ImageConverter::imageCb, this);
 	  image_pub_ = it_.advertise("/image_converter/output_video", 1);
 	  pub2 = nh_.advertise<geometry_msgs::Quaternion>("/cible_humaine", 1000);       //return 4 values
-	  namedWindow("ciblehumaine", CV_WINDOW_AUTOSIZE);
-	  moveWindow( "ciblehumaine",0,600);
+	  namedWindow("choose_ciblehumaine", CV_WINDOW_AUTOSIZE);
+	
   }
 
   
   ~ImageConverter()
   {
-	destroyWindow("ciblehumaine");
+	destroyWindow("choose_ciblehumaine");
   }
 
   
@@ -63,16 +89,21 @@ class ImageConverter
     }
 	
 
-	cv::Mat imgRGB = cv_ptr->image;	
+     imgRGB = cv_ptr->image;
+    // img = imgRGB;
 	
-	vector<Rect> found, found_filtered;
+     vector<Rect> found, found_filtered;
     double t = (double) getTickCount();
     // Run the detector with default parameters. to get a higher hit-rate
     // (and more false alarms, respectively), decrease the hitThreshold and
     // groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
     hog.detectMultiScale(imgRGB, found, 0, Size(8,8), Size(0,0), 1.05, 2);
+    
+    /*
     t = (double) getTickCount() - t;
     cout << "detection time = " << (t*1000./cv::getTickFrequency()) << " ms" << endl;
+    */
+
 
     for(size_t i = 0; i < found.size(); i++ )
     {
@@ -83,7 +114,12 @@ class ImageConverter
         for ( j = 0; j < found.size(); j++ )
             if ( j != i && (r & found[j]) == r )
                 break;
-
+          
+      
+        if((r.x < side_x_l) || ((r.x+r.width) > side_x_r)){
+           cout << "humain a l'exterieur de la zone = " << endl;
+            break;
+        }
         if ( j == found.size() )
             found_filtered.push_back(r);
     }
@@ -107,19 +143,27 @@ class ImageConverter
 		pos_h.w= br.y;
 		pub2.publish(pos_h);
 		cout << "x = " << tp.x << " " << endl;
-	    cout << "y = " << tp.y << " " << endl;
+    cout << "y = " << tp.y << " " << endl;
 		cout << "x2 = " << br.x << " " << endl;
 		cout << "y2 = " << br.y << " " << endl;
 	}
 	image_pub_.publish(cv_ptr->toImageMsg());
-	imshow("ciblehumaine", imgRGB);
+          
+        //imshow("Choix center",img);  
+	imshow("choose_ciblehumaine", imgRGB);
+    cvSetMouseCallback("choose_ciblehumaine", getObjectCenter);
 	waitKey(5);
   }
 };
 
+
+
+
+
+
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "image_converter");
+  ros::init(argc, argv, "image_converter");	
   ImageConverter ic;
   ros::spin();
   return 0;
