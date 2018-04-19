@@ -37,7 +37,15 @@ void getObjectCenter(int event, int x, int y, int flags, void *param = NULL) {
       center_x=x;
       center_y=y;
       side_x_l=x-150;
+      if (side_x_l<0)
+      {
+        side_x_l=0;
+      }
       side_x_r=x+150;
+     if (side_x_r>856)
+      {
+        side_x_r=856;
+      }
       cout << "center_x = " << center_x << " " << endl;
       cout << "center_y = " << center_y << " " << endl;
       cout << "side_x_l = " << side_x_l << " " << endl;
@@ -151,7 +159,7 @@ class ImageConverter
           
         //imshow("Choix center",img);  
 	imshow("choose_ciblehumaine", imgRGB);
-    cvSetMouseCallback("choose_ciblehumaine", getObjectCenter);
+  cvSetMouseCallback("choose_ciblehumaine", getObjectCenter);
 	waitKey(5);
   }
 };
