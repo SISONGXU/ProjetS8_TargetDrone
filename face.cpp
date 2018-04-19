@@ -75,35 +75,38 @@ public:
   {
     std::vector<Rect> faces;
     cv::Mat frame_gray;
- 
+    geometry_msgs::Point pos_f;
     cvtColor( frame, frame_gray, CV_BGR2GRAY );
     equalizeHist( frame_gray, frame_gray );
-
+    float x,y;
     face_cascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_SCALE_IMAGE, Size(30, 30) );
  
      for( int i = 0; i < faces.size(); i++ )
-    {
+    {    x=faces[0].x + faces[0].width*0.5;
+         y=faces[0].y + faces[0].height*0.5;
          Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
          double aspect_ratio = (double)faces[i].width/faces[i].height;
         if( 0.9 < aspect_ratio && aspect_ratio < 1.1 )
         {
        
         ellipse( frame, center, Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar  ( 255, 0, 255 ), 4, 8, 0 );
-       /* if(i=0){
-                ellipse( frame, center, Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar  ( 0, 0, 255 ), 4, 8, 0 );
-                geometry_msgs::Point pos_f;
-		pos_f.x = center.x;
-		pos_f.y = center.y;
-		pos_f.z= cvRound(faces[0].width*0.5*faces[0].height*0.5*3.1415);
-		pub.publish(pos_f);
-         }
- */    if(center.x>300&&center.x<550&&center.y>150&&center.y<350){
+        if(x>300&&x<550&&y>150&&y<350){
         rectangle( frame, faces[i].tl(),faces[i].br(), Scalar(0,255,0), 3 );
-         ROS_INFO("x : %d", center.x);
+        ROS_INFO("x : %d", center.x);
 	ROS_INFO("y : %d", center.y);
-	ROS_INFO("surface : %d", faces[0].width*faces[0].height);}
+	ROS_INFO("surface : %d", faces[i].width*faces[i].height);
+        pos_f.x = center.x;
+	pos_f.y = center.y;
+	pos_f.z= faces[i].width*faces[i].height;
+	pub.publish(pos_f);
 }
-        Mat faceROI = frame_gray( faces[i] );
+        else{
+        pos_f.x = 0;
+	pos_f.y = 0;
+	pos_f.z= 0;
+	pub.publish(pos_f);
+}
+       /* Mat faceROI = frame_gray( faces[i] );
         
         std::vector<Rect> eyes;
         eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
@@ -113,13 +116,12 @@ public:
             Point center( faces[i].x + eyes[j].x + eyes[j].width*0.5, faces[i].y + eyes[j].y + eyes[j].height*0.5 );
             int radius = cvRound( (eyes[j].width + eyes[i].height)*0.25 );
             circle( frame, center, radius, Scalar( 255, 0, 0 ), 4, 8, 0 );
-        }
-    
+        }*/
+
 }
-   
+}
 
     imshow( OPENCV_WINDOW, frame );
-
   }
 
 };
