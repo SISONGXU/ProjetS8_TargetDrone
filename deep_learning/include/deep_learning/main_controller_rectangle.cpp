@@ -7,6 +7,7 @@
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/Quaternion.h>
 #include <fstream>
+#include <vector>
 
 //position couleur
 int centre_x;
@@ -69,28 +70,20 @@ void posCallbackRectangle(const geometry_msgs::Quaternion pos_h)
 
 int posCallbackDeepLearning(void)
 {
-	int x1, x2, y1, y2;
-	string str_values[4];
-	int int_values[4];
-	ifstream infile ("src/deep_learning/src/rectangle.txt");
-	stringstream ss;
-	if (infile.is_open())
+	int x1, y1, x2, y2;
+	ifstream infile;
+	
+	if (infile.fail())
 	{
-		for (int line=0; line<=3; line++){
-			getline(infile, str_values[line]);
-			ss.clear();
-			ss.str(str_values[line]);
-			ss >> int_values[line];
-		}
-		x1 = int_values[0];
-		y1 = int_values[1];
-		x2 = int_values[2];
-		y2 = int_values[3];
+		cerr << "File can't be opened!" << endl;
 	}else{
-		cerr << "rectangle.txt can't be open!";
+		infile.open("src/deep_learning/src/rectangle.txt");
+		infile >> x1 >> y1 >> x2 >> y2;
+		rectangle_x1 = x1; 
+		rectangle_y1 = y1;
+		rectangle_x2 = x2;
+		rectangle_y2 = y2;
 	}
-    	infile.close();
-	return (x1, y1, x2, y2);
 }
 
 
@@ -135,7 +128,7 @@ int main(int argc, char **argv)
 	  }
 	  
 	// Uncomment to use the Deep Learning box positions
-	rectangle_x1, rectangle_y1, rectangle_x2, rectangle_y2 = posCallbackDeepLearning();
+	posCallbackDeepLearning();
 
 	centre_x = (rectangle_x1 + rectangle_x2)/2;
 	centre_y = (rectangle_y1 + rectangle_y2)/2;
@@ -277,12 +270,16 @@ int main(int argc, char **argv)
 			printf("vitesse avancement %f\n\r",avancement);	
 
 		}
+		printf("x1 : %d \n\r",rectangle_x1);
+		printf("y1 : %d \n\r",rectangle_y1);
+		printf("x2 : %d \n\r",rectangle_x2);
+		printf("y2 : %d \n\r",rectangle_y2);
 		printf("\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r");
 	 }
 	 // Box missed
 	if ((centre_x == 0) && (centre_y == 0))
  	{
-		printf("Box missed.");
+		printf("Box missed.\n\r");
 		avancement = 0.00; translation = 0.00; hauteur = 0.00; rotation = 0.00;
 	}
 	 bebop.setCommand(avancement, translation, hauteur, rotation);
