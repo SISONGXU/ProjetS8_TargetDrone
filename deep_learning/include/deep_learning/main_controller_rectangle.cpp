@@ -4,6 +4,7 @@
 #include <unistd.h> 
 #include <ios>
 #include <string>
+#include <geometry_msgs/Point.h>
 #include <geometry_msgs/Quaternion.h>
 #include <fstream>
 
@@ -48,7 +49,7 @@ using namespace std;
 //recuperation de la position couleur
 void  posCallback(const geometry_msgs::Point myPos)
 {
-	centre_x=myPos.x;
+	centre_x = myPos.x;
 	centre_y = myPos.y;
 	taille_h = myPos.z;
 }
@@ -62,9 +63,13 @@ void posCallbackRectangle(const geometry_msgs::Quaternion pos_h)
 	rectangle_y2 = pos_h.w;	
 }
 
+// Récupération de la position du rectangle du fichier rectangle.txt (Deep Learning)
+
+// /!\ Nécessite le package Deep Learning /!\
+
 int posCallbackDeepLearning(void)
 {
-
+	int x1, x2, y1, y2;
 	string str_values[4];
 	int int_values[4];
 	ifstream infile ("src/deep_learning/src/rectangle.txt");
@@ -77,15 +82,15 @@ int posCallbackDeepLearning(void)
 			ss.str(str_values[line]);
 			ss >> int_values[line];
 		}
-		rectangle_x1 = int_values[0];
-		rectangle_y1 = int_values[1];
-		rectangle_x2 = int_values[2];
-		rectangle_y2 = int_values[3];
+		x1 = int_values[0];
+		y1 = int_values[1];
+		x2 = int_values[2];
+		y2 = int_values[3];
 	}else{
 		cerr << "rectangle.txt can't be open!";
 	}
     	infile.close();
-	return (rectangle_x1, rectangle_y1, rectangle_x2, rectangle_y2);
+	return (x1, y1, x2, y2);
 }
 
 
@@ -111,9 +116,7 @@ int main(int argc, char **argv)
   ros::Subscriber sub = n.subscribe("/cible", 1000, posCallbackRectangle); //changement
 
 
-  // Uncomment to use the Deep Learning box positions
-  rectangle_x1, rectangle_y1, rectangle_x2, rectangle_y2 = posCallbackDeepLearning();
-  printf("%d %d %d %d",rectangle_x1, rectangle_y1, rectangle_x2, rectangle_y2);
+  
   DroneController bebop;
   
   initscr();
@@ -131,6 +134,9 @@ int main(int argc, char **argv)
 			  zoom_timer=0;}
 	  }
 	  
+	// Uncomment to use the Deep Learning box positions
+	rectangle_x1, rectangle_y1, rectangle_x2, rectangle_y2 = posCallbackDeepLearning();
+
 	centre_x = (rectangle_x1 + rectangle_x2)/2;
 	centre_y = (rectangle_y1 + rectangle_y2)/2;
 	taille_h = (rectangle_x2-rectangle_x1)*(rectangle_y2-rectangle_y1);
@@ -194,13 +200,13 @@ int main(int argc, char **argv)
 			  track=0;
 			  }
 			   break;
-		   case 98: // b: zoom in
+		  case 98: // b: zoom in
 			   if (zoom_timer==0){
 				   taille_init=taille_init*1.1;
 				   zoom_timer++;
 			   }
 			   break;
-		   case 99: // c:zoom out
+		  case 99: // c:zoom out
 			   if(zoom_timer==0){
 				   taille_init=taille_init*0.9;
 				   zoom_timer++;
@@ -217,8 +223,8 @@ int main(int argc, char **argv)
      {
 		if(track!=0)
 		{
-			printf("couleur X %d\n\r",centre_x);
-			printf("couleur y %d\n\r" ,centre_y);
+			printf("centre X %d\n\r",centre_x);
+			printf("centre y %d\n\r" ,centre_y);
 			printf("taille  %f\n\r",taille_h);
 
 			//calcul vitesse de deplacement en hauteur
@@ -265,7 +271,7 @@ int main(int argc, char **argv)
 					avancement=avancement - 0.01;
 			}
 				if(taille_h<100){				
-					avancement=0;
+					avancement=0.00; translation = 0.00; hauteur = 0.00; rotation = 0.00;
 					printf("Cible perdue\n\r");
 			}
 			printf("vitesse avancement %f\n\r",avancement);	
@@ -274,10 +280,10 @@ int main(int argc, char **argv)
 		printf("\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r");
 	 }
 	 // Box missed
-	if ((centre_x == -2147483648) && (centre_y == -2147483648))
+	if ((centre_x == 0) && (centre_y == 0))
  	{
 		printf("Box missed.");
-		avancement = 0.00, translation = 0.00, hauteur = 0.00, rotation = 0.00;
+		avancement = 0.00; translation = 0.00; hauteur = 0.00; rotation = 0.00;
 	}
 	 bebop.setCommand(avancement, translation, hauteur, rotation);
 	  
