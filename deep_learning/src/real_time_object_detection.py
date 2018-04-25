@@ -44,6 +44,7 @@ fps = FPS().start()
 # loop over the frames from the video stream
 while True:
 	try:
+		time1 = time.time()
 		# grab the frame from the threaded video stream and resize it
 		# to have a maximum width of 1000 pixels
 		frame = cv2.imread("stream.bmp")
@@ -51,8 +52,8 @@ while True:
 		#frame = imutils.resize(frame, width=1000)
 		# grab the frame dimensions and convert it to a blob
 		(h, w) = frame.shape[:2]
-		blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)),
-			0.007843, (200, 200), 127.5)
+		blob = cv2.dnn.blobFromImage(cv2.resize(frame, (350, 350)),
+			0.007843, (350, 350), 127.5)
 
 		# pass the blob through the network and obtain the detections and
 		# predictions
@@ -88,7 +89,7 @@ while True:
 					y = startY - 15 if startY - 15 > 15 else startY + 15
 					cv2.putText(frame, label, (startX, y),
 						cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
-					print("")
+					print("\r\r\r\r\r\r\r\r")
 					print("Person %s" %i)
 					print("###########################")
 					print("start x : %s " % startX)
@@ -96,6 +97,21 @@ while True:
 					print("end x : %s " % endX)
 					print("end y : %s " % endY)
 					print("###########################")
+					
+					# Create a file that contains corners position of the target box. In the order of lines : startX, startY, endX, endY 
+					file = open("rectangle.txt", "w")
+					file.write(str(startX))
+					file.write("\r%s" %str(startY))
+					file.write("\r%s" %str(endX))
+					file.write("\r%s" %str(endY))
+					file.close()
+				else:
+					file = open("rectangle.txt", "w")
+					file.write("0")
+					file.write("\r0")
+					file.write("\r0")
+					file.write("\r0")
+					file.close()
 
 		# show the output frame
 		cv2.imshow("Deep Learning detection window", frame)
@@ -107,6 +123,9 @@ while True:
 
 		# update the FPS counter
 		fps.update()
+		time2 = time.time()
+		print("FPS : %s" %round(1/(time2-time1)))
+		print("\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r")
 	except AttributeError:
 		print("Missed frame.")
 
