@@ -151,7 +151,7 @@ class ImageConverter
 		pos_h.w= br.y;
 		pub2.publish(pos_h);
 		cout << "x = " << tp.x << " " << endl;
-    cout << "y = " << tp.y << " " << endl;
+    		cout << "y = " << tp.y << " " << endl;
 		cout << "x2 = " << br.x << " " << endl;
 		cout << "y2 = " << br.y << " " << endl;
 	}
